@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "outDir": "lib",
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "lib": ["es6", "dom"],
+        "jsx": "react",
+        "target": "es5",
+        "declaration": true,
+        "noImplicitAny": false,
+        "sourceMap": false
+    },
+    "include": [
+      "src/client/**/*.ts",
+    ]
+}
