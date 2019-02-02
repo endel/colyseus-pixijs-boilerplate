@@ -2,13 +2,24 @@ import * as PIXI from "pixi.js";
 import { Client, DataChange } from "colyseus.js";
 
 const entities: {[id: string]: PIXI.Graphics} = {};
+let currentPlayerEntity: PIXI.Graphics;
 
 const app = new PIXI.Application({ width: 800, height: 600, backgroundColor: 0x000000 });
 document.body.appendChild(app.view);
 
 const client = new Client("ws://localhost:8080");
 const room = client.join("arena");
-room.onJoin.add(() => {});
+
+room.onJoin.add(() => {
+    window.onmousemove = function (e: MouseEvent) {
+        if (currentPlayerEntity) {
+            // const angle = 180 * Math.atan2(e.clientX - currentPlayerEntity.x, e.clientY - currentPlayerEntity.y) / Math.PI;
+            // console.log(e.clientX - currentPlayerEntity.x,  e.clientY - currentPlayerEntity.y);
+            const angle = Math.atan2(e.clientX - currentPlayerEntity.x, e.clientY - currentPlayerEntity.y);
+            room.send(['angle', angle]);
+        }
+    }
+});
 
 // add / removal of entities
 room.listen("entities/:id", (change: DataChange) => {
@@ -24,6 +35,11 @@ room.listen("entities/:id", (change: DataChange) => {
         app.stage.addChild(graphics);
 
         entities[change.path.id] = graphics;
+
+        // detecting current user
+        if (change.path.id === room.sessionId) {
+            currentPlayerEntity = graphics;
+        }
 
     } else if (change.operation === "remove") {
         app.stage.removeChild(entities[change.path.id]);

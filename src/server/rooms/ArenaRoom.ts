@@ -7,7 +7,7 @@ class Entity {
 
   @nosync angle: number = 0;
 
-  constructor (x: number, y: number, radius: number) {
+  constructor(x: number, y: number, radius: number) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -17,7 +17,7 @@ class Entity {
 class State {
   entities: { [id: string]: Entity } = {};
 
-  update () {
+  update() {
     for (let sessionId in this.entities) {
       const entity = this.entities[sessionId];
       entity.x += (Math.cos(entity.angle) * 1) + 1;
@@ -28,16 +28,21 @@ class State {
 
 export class ArenaRoom extends Room {
 
-  onInit () {
+  onInit() {
     this.setState(new State());
     this.setSimulationInterval(() => this.state.update());
   }
 
-  onJoin (client: Client, options: any) {
+  onJoin(client: Client, options: any) {
     this.state.entities[client.sessionId] = new Entity(Math.random() * 800, Math.random() * 600, 10);
   }
 
   onMessage(client: Client, message: any) {
+    const [command, data] = message;
+
+    if (command === "angle") {
+      this.state.entities[client.sessionId].angle = data;
+    }
   }
 
   onLeave(client: Client) {
