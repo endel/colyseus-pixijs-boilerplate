@@ -2,6 +2,8 @@
 
 A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version of the classical [agar.io](http://agar.io/) game.
 
+[View live demo](https://colyseus-pixijs-boilerplate.herokuapp.com)
+
 ## Directory structure
 
 ```
