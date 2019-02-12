@@ -22,7 +22,7 @@ export class Application extends PIXI.Application {
         super({
             width: window.innerWidth,
             height: window.innerHeight,
-            backgroundColor: 0x0f0f0f
+            backgroundColor: 0x0c0c0c
         });
 
         this.viewport = new Viewport({
@@ -32,15 +32,24 @@ export class Application extends PIXI.Application {
             worldHeight: WORLD_SIZE,
         });
 
+        // draw boundaries of the world
         const boundaries = new PIXI.Graphics();
         boundaries.beginFill(0x000000);
         boundaries.drawRoundedRect(0, 0, WORLD_SIZE, WORLD_SIZE, 30);
         this.viewport.addChild(boundaries);
 
+        // add viewport to stage
         this.stage.addChild(this.viewport);
 
         this.initialize();
         this.interpolation = false;
+
+        this.viewport.on("mousemove", (e) => {
+            if (this.currentPlayerEntity) {
+                const point = this.viewport.toLocal(e.data.global);
+                this.room.send(['mouse', { x: point.x, y: point.y }]);
+            }
+        });
     }
 
     initialize() {
@@ -94,15 +103,6 @@ export class Application extends PIXI.Application {
             // }
 
         });
-
-        this.stage.interactive = true;
-        this.viewport.on("mousemove", (e) => {
-            if (this.currentPlayerEntity) {
-                const point = this.viewport.toLocal(e.data.global);
-                this.room.send(['mouse', {x: point.x, y: point.y}]);
-            }
-        });
-
     }
 
     set interpolation (bool: boolean) {
