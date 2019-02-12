@@ -15,6 +15,9 @@ export class Application extends PIXI.Application {
 
     viewport: Viewport;
 
+    _axisListener: any;
+    _interpolation: boolean;
+
     constructor () {
         super({
             width: window.innerWidth,
@@ -37,6 +40,7 @@ export class Application extends PIXI.Application {
         this.stage.addChild(this.viewport);
 
         this.initialize();
+        this.interpolation = false;
     }
 
     initialize() {
@@ -82,7 +86,6 @@ export class Application extends PIXI.Application {
             graphics.drawCircle(0, 0, change.value);
             graphics.endFill();
 
-            // this.viewport.zoom(change.value / 10);
             // if (this.currentPlayerEntity) {
             //     // console.log(this.currentPlayerEntity.width);
             //     // console.log(this.currentPlayerEntity.width / 20);
@@ -100,11 +103,21 @@ export class Application extends PIXI.Application {
             }
         });
 
-        // // THIS IS CHOPPY
-        // // update entities position directly when they arrive
-        // this.room.listen("entities/:id/:axis", (change: DataChange) => {
-        //     this.entities[change.path.id][change.path.axis] = change.value;
-        // });
+    }
+
+    set interpolation (bool: boolean) {
+        this._interpolation = bool;
+
+        if (this._interpolation) {
+            this.room.removeListener(this._axisListener);
+            this.loop();
+
+        } else {
+            // update entities position directly when they arrive
+            this._axisListener = this.room.listen("entities/:id/:axis", (change: DataChange) => {
+                this.entities[change.path.id][change.path.axis] = change.value;
+            }, true);
+        }
     }
 
     loop () {
@@ -113,6 +126,9 @@ export class Application extends PIXI.Application {
             this.entities[id].y = lerp(this.entities[id].y, this.room.state.entities[id].y, 0.2);
         }
 
-        requestAnimationFrame(this.loop.bind(this));
+        // continue looping if interpolation is still enabled.
+        if (this._interpolation) {
+            requestAnimationFrame(this.loop.bind(this));
+        }
     }
 }

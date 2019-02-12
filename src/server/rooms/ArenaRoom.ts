@@ -67,7 +67,7 @@ class State {
           if (collideTestEntity === entity) { continue; }
 
           if (distance(entity, collideTestEntity) < entity.radius) {
-            entity.radius += collideTestEntity.radius / 2;
+            entity.radius += collideTestEntity.radius / 5;
             collideTestEntity.dead = true;
             deadEntities.push(collideSessionId);
 
