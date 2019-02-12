@@ -7,7 +7,7 @@ class Entity {
   radius: number;
 
   @nosync angle: number = 0;
-  @nosync speed = 5;
+  @nosync speed = 0;
 
   constructor(x: number, y: number, radius: number) {
     this.x = x;
@@ -16,9 +16,11 @@ class Entity {
   }
 }
 
+const WORLD_SIZE = 2000;
+
 class State {
-  width = 800;
-  height = 600;
+  width = WORLD_SIZE;
+  height = WORLD_SIZE;
 
   entities: { [id: string]: Entity } = {};
 
@@ -26,7 +28,6 @@ class State {
     // create some food entities
     for (let i=0; i<100; i++) {
       const food = new Entity(Math.random() * this.width, Math.random() * this.height, 2);
-      food.speed = 0;
       this.entities[nanoid()] = food;
     }
   }
@@ -41,6 +42,12 @@ class State {
       if (entity.speed > 0) {
         entity.x -= (Math.cos(entity.angle)) * entity.speed;
         entity.y -= (Math.sin(entity.angle)) * entity.speed;
+
+        // apply boundary limits
+        if (entity.x < 0) { entity.x = 0; }
+        if (entity.x > WORLD_SIZE) { entity.x = WORLD_SIZE; }
+        if (entity.y < 0) { entity.y = 0; }
+        if (entity.y > WORLD_SIZE) { entity.y = WORLD_SIZE; }
       }
     }
   }
@@ -61,8 +68,11 @@ export class ArenaRoom extends Room {
     const [command, data] = message;
 
   // change angle
-    if (command === "a") { 
-      this.state.entities[client.sessionId].angle = data;
+    if (command === "mouse") { 
+      const entity = this.state.entities[client.sessionId];
+      const distance = Math.sqrt(Math.pow(entity.y - data.y, 2) + Math.pow(entity.x - data.x, 2));
+      entity.speed = (distance < 20) ? 0 : Math.min(distance / 10, 6);
+      entity.angle = Math.atan2(entity.y - data.y, entity.x - data.x);
     }
   }
 
