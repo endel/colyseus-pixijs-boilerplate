@@ -72,12 +72,30 @@ export class Application extends PIXI.Application {
             }
         });
 
+        this.room.listen("entities/:id/radius", (change: DataChange) => {
+            const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
+
+            const graphics = this.entities[change.path.id];
+            graphics.clear();
+            graphics.lineStyle(0);
+            graphics.beginFill(color, 0.5);
+            graphics.drawCircle(0, 0, change.value);
+            graphics.endFill();
+
+            // this.viewport.zoom(change.value / 10);
+            // if (this.currentPlayerEntity) {
+            //     // console.log(this.currentPlayerEntity.width);
+            //     // console.log(this.currentPlayerEntity.width / 20);
+            //     this.viewport.scale.x = lerp(this.viewport.scale.x, this.currentPlayerEntity.width / 20, 0.2)
+            //     this.viewport.scale.y = lerp(this.viewport.scale.y, this.currentPlayerEntity.width / 20, 0.2)
+            // }
+
+        });
+
         this.stage.interactive = true;
         this.viewport.on("mousemove", (e) => {
             if (this.currentPlayerEntity) {
                 const point = this.viewport.toLocal(e.data.global);
-                console.log(point.x, point.y);
-
                 this.room.send(['mouse', {x: point.x, y: point.y}]);
             }
         });
