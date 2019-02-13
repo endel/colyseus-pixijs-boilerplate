@@ -10,7 +10,7 @@ export class Application extends PIXI.Application {
     entities: { [id: string]: PIXI.Graphics } = {};
     currentPlayerEntity: PIXI.Graphics;
 
-    client = new Client("ws://localhost:8080");
+    client = new Client(window.location.href.replace("http", "ws"));
     room = this.client.join("arena");
 
     viewport: Viewport;
