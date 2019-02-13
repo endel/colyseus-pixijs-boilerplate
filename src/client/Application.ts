@@ -2,15 +2,19 @@ import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
 import { Client, DataChange } from "colyseus.js";
 
-export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
+const ENDPOINT = (process.env.NODE_ENV==="development")
+    ? "ws://localhost:8080"
+    : "wss://colyseus-pixijs-boilerplate.herokuapp.com";
 
 const WORLD_SIZE = 2000;
+
+export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
 
 export class Application extends PIXI.Application {
     entities: { [id: string]: PIXI.Graphics } = {};
     currentPlayerEntity: PIXI.Graphics;
 
-    client = new Client(window.location.href.replace("http", "ws"));
+    client = new Client(ENDPOINT);
     room = this.client.join("arena");
 
     viewport: Viewport;
