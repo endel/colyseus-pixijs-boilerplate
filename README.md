@@ -4,6 +4,17 @@ A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version
 
 [View live demo](https://colyseus-pixijs-boilerplate.herokuapp.com)
 
+## Running locally
+
+```
+git clone https://github.com/endel/colyseus-pixijs-boilerplate.git
+cd colyseus-pixijs-boilerplate
+npm install
+npm run dev
+```
+
+Open [http://localhost:8080](http://localhost:8080) in your browser.
+
 ## Directory structure
 
 ```

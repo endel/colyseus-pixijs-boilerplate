@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "heroku-postbuild": "npm run build",
-    "start": "nodemon",
-    "build": "webpack",
+    "heroku-postbuild": "tsc && webpack",
+    "start": "node ./lib/index.js",
+    "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Endel Dreyer",
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^4.16.1",
     "colyseus.js": "^0.9.16",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^3.0.1",

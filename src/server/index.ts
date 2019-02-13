@@ -38,7 +38,7 @@ if (process.env.NODE_ENV !== "production") {
 
 } else {
     // on production, use ./public as static root
-    STATIC_DIR = path.resolve(__dirname, "..", "..", "public");
+    STATIC_DIR = path.resolve(__dirname, "public");
 }
 
 app.use("/", express.static(STATIC_DIR));
