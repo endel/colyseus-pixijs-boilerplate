@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
-import { Client, DataChange } from "colyseus.js";
+import { Client, DataChange, SchemaSerializer } from "colyseus.js";
+import { State } from "../server/rooms/State";
 
 const ENDPOINT = (process.env.NODE_ENV==="development")
     ? "ws://localhost:8080"
@@ -15,7 +16,7 @@ export class Application extends PIXI.Application {
     currentPlayerEntity: PIXI.Graphics;
 
     client = new Client(ENDPOINT);
-    room = this.client.join("arena");
+    room = this.client.join<State, SchemaSerializer<State>>("arena", {}, new SchemaSerializer<State>(new State()));
 
     viewport: Viewport;
 
@@ -57,10 +58,11 @@ export class Application extends PIXI.Application {
     }
 
     initialize() {
+
         // add / removal of entities
         this.room.listen("entities/:id", (change: DataChange) => {
             if (change.operation === "add") {
-                const color = (change.value.radius < 4)
+                const color = (change.value.radius < 10)
                     ? 0xff0000
                     : 0xFFFF0B;
 
@@ -90,7 +92,7 @@ export class Application extends PIXI.Application {
         });
 
         this.room.listen("entities/:id/radius", (change: DataChange) => {
-            const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
+            const color = (change.value < 10) ? 0xff0000 : 0xFFFF0B;
 
             const graphics = this.entities[change.path.id];
             graphics.clear();

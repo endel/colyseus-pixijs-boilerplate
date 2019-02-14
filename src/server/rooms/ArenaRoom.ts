@@ -1,14 +1,19 @@
-import { Room, Client } from "colyseus";
+import { Room, Client, SchemaSerializer } from "colyseus";
 import { Entity } from "./Entity";
 import { State } from "./State";
+import { serialize } from "colyseus/lib/serializer/Serializer";
 
-export class ArenaRoom extends Room {
+@serialize(SchemaSerializer)
+export class ArenaRoom extends Room<State> {
+
   onInit() {
     this.setState(new State());
+    this.state.initialize();
     this.setSimulationInterval(() => this.state.update());
   }
 
   onJoin(client: Client, options: any) {
+    console.log(client.sessionId, "JOINED");
     this.state.createPlayer(client.sessionId);
   }
 
@@ -26,12 +31,13 @@ export class ArenaRoom extends Room {
   // change angle
     if (command === "mouse") { 
       const dst = Entity.distance(entity, data as Entity);
-      entity.speed = (dst < 20) ? 0 : Math.min(dst / 10, 6);
+      entity.speed = (dst < 20) ? 0 : Math.min(dst / 15, 4);
       entity.angle = Math.atan2(entity.y - data.y, entity.x - data.x);
     }
   }
 
   onLeave(client: Client) {
+    console.log(client.sessionId, "LEFT!");
     const entity = this.state.entities[client.sessionId];
 
     // entity may be already dead.
