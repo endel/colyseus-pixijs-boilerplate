@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
-import { Client, DataChange, SchemaSerializer } from "colyseus.js";
+import { Client, SchemaSerializer } from "colyseus.js";
 import { State } from "../server/rooms/State";
+import { DataChange } from "@colyseus/schema";
 
 const ENDPOINT = (process.env.NODE_ENV==="development")
     ? "ws://localhost:8080"
@@ -58,71 +59,74 @@ export class Application extends PIXI.Application {
     }
 
     initialize() {
+        this.room.state.onChange = function (changes: DataChange[]) {
+            console.log(changes);
+        }
 
-        // add / removal of entities
-        this.room.listen("entities/:id", (change: DataChange) => {
-            if (change.operation === "add") {
-                const color = (change.value.radius < 10)
-                    ? 0xff0000
-                    : 0xFFFF0B;
+        // // add / removal of entities
+        // this.room.listen("entities/:id", (change: DataChange) => {
+        //     if (change.operation === "add") {
+        //         const color = (change.value.radius < 10)
+        //             ? 0xff0000
+        //             : 0xFFFF0B;
 
-                const graphics = new PIXI.Graphics();
-                graphics.lineStyle(0);
-                graphics.beginFill(color, 0.5);
-                graphics.drawCircle(0, 0, change.value.radius);
-                graphics.endFill();
+        //         const graphics = new PIXI.Graphics();
+        //         graphics.lineStyle(0);
+        //         graphics.beginFill(color, 0.5);
+        //         graphics.drawCircle(0, 0, change.value.radius);
+        //         graphics.endFill();
 
-                graphics.x = change.value.x;
-                graphics.y = change.value.y;
-                this.viewport.addChild(graphics);
+        //         graphics.x = change.value.x;
+        //         graphics.y = change.value.y;
+        //         this.viewport.addChild(graphics);
 
-                this.entities[change.path.id] = graphics;
+        //         this.entities[change.path.id] = graphics;
 
-                // detecting current user
-                if (change.path.id === this.room.sessionId) {
-                    this.currentPlayerEntity = graphics;
-                    this.viewport.follow(this.currentPlayerEntity);
-                }
+        //         // detecting current user
+        //         if (change.path.id === this.room.sessionId) {
+        //             this.currentPlayerEntity = graphics;
+        //             this.viewport.follow(this.currentPlayerEntity);
+        //         }
 
-            } else if (change.operation === "remove") {
-                this.viewport.removeChild(this.entities[change.path.id]);
-                this.entities[change.path.id].destroy();
-                delete this.entities[change.path.id];
-            }
-        });
+        //     } else if (change.operation === "remove") {
+        //         this.viewport.removeChild(this.entities[change.path.id]);
+        //         this.entities[change.path.id].destroy();
+        //         delete this.entities[change.path.id];
+        //     }
+        // });
 
-        this.room.listen("entities/:id/radius", (change: DataChange) => {
-            const color = (change.value < 10) ? 0xff0000 : 0xFFFF0B;
+        // this.room.listen("entities/:id/radius", (change: DataChange) => {
+        //     const color = (change.value < 10) ? 0xff0000 : 0xFFFF0B;
 
-            const graphics = this.entities[change.path.id];
-            graphics.clear();
-            graphics.lineStyle(0);
-            graphics.beginFill(color, 0.5);
-            graphics.drawCircle(0, 0, change.value);
-            graphics.endFill();
+        //     const graphics = this.entities[change.path.id];
+        //     graphics.clear();
+        //     graphics.lineStyle(0);
+        //     graphics.beginFill(color, 0.5);
+        //     graphics.drawCircle(0, 0, change.value);
+        //     graphics.endFill();
 
-            // if (this.currentPlayerEntity) {
-            //     // console.log(this.currentPlayerEntity.width);
-            //     // console.log(this.currentPlayerEntity.width / 20);
-            //     this.viewport.scale.x = lerp(this.viewport.scale.x, this.currentPlayerEntity.width / 20, 0.2)
-            //     this.viewport.scale.y = lerp(this.viewport.scale.y, this.currentPlayerEntity.width / 20, 0.2)
-            // }
+        //     // if (this.currentPlayerEntity) {
+        //     //     // console.log(this.currentPlayerEntity.width);
+        //     //     // console.log(this.currentPlayerEntity.width / 20);
+        //     //     this.viewport.scale.x = lerp(this.viewport.scale.x, this.currentPlayerEntity.width / 20, 0.2)
+        //     //     this.viewport.scale.y = lerp(this.viewport.scale.y, this.currentPlayerEntity.width / 20, 0.2)
+        //     // }
 
-        });
+        // });
     }
 
     set interpolation (bool: boolean) {
         this._interpolation = bool;
 
         if (this._interpolation) {
-            this.room.removeListener(this._axisListener);
+            // this.room.removeListener(this._axisListener);
             this.loop();
 
         } else {
-            // update entities position directly when they arrive
-            this._axisListener = this.room.listen("entities/:id/:axis", (change: DataChange) => {
-                this.entities[change.path.id][change.path.axis] = change.value;
-            }, true);
+            // // update entities position directly when they arrive
+            // this._axisListener = this.room.listen("entities/:id/:axis", (change: DataChange) => {
+            //     this.entities[change.path.id][change.path.axis] = change.value;
+            // }, true);
         }
     }
 
