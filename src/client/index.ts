@@ -1,6 +1,7 @@
 import { Application } from "./Application";
 
 const app = new Application();
+app.interpolation = true;
 document.body.appendChild(app.view);
 
 // allow to resize viewport and renderer 
