@@ -1,6 +1,6 @@
 import * as nanoid from "nanoid";
 import { Entity } from "./Entity";
-import { Schema, type } from "@colyseus/schema";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 
 const WORLD_SIZE = 2000;
 const DEFAULT_PLAYER_RADIUS = 10;
@@ -11,7 +11,7 @@ export class State extends Schema {
   height = WORLD_SIZE;
 
   @type({ map: Entity })
-  entities: { [id: string]: Entity } = {};
+  entities = new MapSchema<Entity>();
 
   initialize () {
     // create some food entities
@@ -23,7 +23,7 @@ export class State extends Schema {
   createFood () {
     const radius = Math.max(4, (Math.random() * (DEFAULT_PLAYER_RADIUS - 1)));
     const food = new Entity(Math.random() * this.width, Math.random() * this.height, radius);
-    this.entities[nanoid()] = food;
+    this.entities[nanoid(8)] = food;
   }
 
   createPlayer (sessionId: string) {
