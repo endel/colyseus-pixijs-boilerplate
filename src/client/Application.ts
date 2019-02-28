@@ -3,7 +3,6 @@ import * as Viewport from "pixi-viewport";
 import { Client, SchemaSerializer } from "colyseus.js";
 import { State } from "../server/rooms/State";
 import { DataChange } from "@colyseus/schema";
-import { Entity } from "../server/rooms/Entity";
 
 const ENDPOINT = (process.env.NODE_ENV==="development")
     ? "ws://localhost:8080"
@@ -18,7 +17,7 @@ export class Application extends PIXI.Application {
     currentPlayerEntity: PIXI.Graphics;
 
     client = new Client(ENDPOINT);
-    room = this.client.join<State, SchemaSerializer<State>>("arena", {}, new SchemaSerializer<State>(new State()));
+    room = this.client.join<State>("arena", {});
 
     viewport: Viewport;
 
@@ -47,7 +46,7 @@ export class Application extends PIXI.Application {
         // add viewport to stage
         this.stage.addChild(this.viewport);
 
-        this.initialize();
+        this.room.onJoin.add(() => this.initialize());
         this.interpolation = false;
 
         this.viewport.on("mousemove", (e) => {
