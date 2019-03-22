@@ -1,6 +1,7 @@
+import { Client } from "colyseus";
 import * as nanoid from "nanoid";
 import { Entity } from "./Entity";
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, filter } from "@colyseus/schema";
 
 const WORLD_SIZE = 2000;
 const DEFAULT_PLAYER_RADIUS = 10;
@@ -10,6 +11,14 @@ export class State extends Schema {
   width = WORLD_SIZE;
   height = WORLD_SIZE;
 
+  @filter(function(this: State, client: Client, entity: Entity) {
+    const currentPlayer = this.entities[client.sessionId] || {};
+
+    var a = entity.x - currentPlayer.x;
+    var b = entity.y - currentPlayer.y;
+
+    return Math.sqrt(a * a + b * b) <= 200;
+  })
   @type({ map: Entity })
   entities = new MapSchema<Entity>();
 

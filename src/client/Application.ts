@@ -77,6 +77,8 @@ export class Application extends PIXI.Application {
 
     initializeSchema() {
         this.room.state.entities.onAdd = (entity, sessionId: string) => {
+            console.log("ENTITY ADDED!", sessionId, entity);
+
             const color = (entity.radius < 10)
                 ? 0xff0000
                 : 0xFFFF0B;
@@ -100,7 +102,6 @@ export class Application extends PIXI.Application {
             }
 
             entity.onChange = (changes) => {
-                console.log("entity change: ", entity.x, entity.y);
                 const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
 
                 const graphics = this.entities[sessionId];
