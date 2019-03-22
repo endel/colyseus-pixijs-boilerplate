@@ -1,9 +1,7 @@
-import { Room, Client, SchemaSerializer } from "colyseus";
+import { Room, Client } from "colyseus";
 import { Entity } from "./Entity";
 import { State } from "./State";
-import { serialize } from "colyseus/lib/serializer/Serializer";
 
-@serialize(SchemaSerializer)
 export class ArenaRoom extends Room<State> {
 
   onInit() {
