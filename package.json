@@ -32,9 +32,8 @@
   },
   "dependencies": {
     "@colyseus/monitor": "^0.1.11",
-    "@colyseus/schema": "^0.3.0",
-    "colyseus": "^0.10.0-alpha.4",
-    "colyseus.js": "^0.10.0-alpha-7",
+    "colyseus": "^0.10.3",
+    "colyseus.js": "^0.10.4",
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6"
   }
