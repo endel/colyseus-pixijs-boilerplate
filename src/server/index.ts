@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== "production") {
     webpackHotMiddleware = require("webpack-hot-middleware");
 }
 
-import colyseus from "colyseus";
+import { Server } from "colyseus";
 import http from "http";
 import express from "express";
 import path from "path";
@@ -24,7 +24,7 @@ export const endpoint = "localhost";
 export let STATIC_DIR: string;
 
 const app = express();
-const gameServer = new colyseus.Server({ server: http.createServer(app) });
+const gameServer = new Server({ server: http.createServer(app) });
 
 gameServer.register("arena", ArenaRoom);
 
