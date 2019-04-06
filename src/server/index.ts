@@ -9,11 +9,11 @@ if (process.env.NODE_ENV !== "production") {
     webpackHotMiddleware = require("webpack-hot-middleware");
 }
 
-import * as colyseus from "colyseus";
-import * as http from "http";
-import * as express from "express";
-import * as path from "path";
-import * as basicAuth from "express-basic-auth";
+import colyseus from "colyseus";
+import http from "http";
+import express from "express";
+import path from "path";
+import basicAuth from "express-basic-auth";
 import { monitor } from "@colyseus/monitor";
 
 import { ArenaRoom } from "./rooms/ArenaRoom";
