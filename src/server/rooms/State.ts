@@ -1,4 +1,4 @@
-import * as nanoid from "nanoid";
+import nanoid from "nanoid";
 import { Entity } from "./Entity";
 import { Schema, type, MapSchema } from "@colyseus/schema";
 
@@ -50,15 +50,15 @@ export class State extends Schema {
 
           // prevent collision with itself
           if (collideTestEntity === entity) {
-            continue; 
+            continue;
           }
 
           if (
-            entity.radius > collideTestEntity.radius && 
+            entity.radius > collideTestEntity.radius &&
             Entity.distance(entity, collideTestEntity) <= entity.radius - (collideTestEntity.radius / 2)
           ) {
             let winnerEntity: Entity = entity;
-            let loserEntity: Entity = collideTestEntity; 
+            let loserEntity: Entity = collideTestEntity;
             let loserEntityId: string = collideSessionId;
 
             winnerEntity.radius += loserEntity.radius / 5;
