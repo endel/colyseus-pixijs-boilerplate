@@ -6,7 +6,7 @@
   "scripts": {
     "heroku-postbuild": "tsc && webpack",
     "start": "node ./lib/index.js",
-    "dev": "nodemon --debug",
+    "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Endel Dreyer",
@@ -32,7 +32,7 @@
     "webpack-hot-middleware": "^2.24.3"
   },
   "dependencies": {
-    "@colyseus/monitor": "^0.1.11",
+    "@colyseus/monitor": "^0.10.0",
     "colyseus": "^0.10.3",
     "colyseus.js": "^0.10.4",
     "express": "^4.16.4",
