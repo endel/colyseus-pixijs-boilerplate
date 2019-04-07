@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
-import { Client, DataChange } from "colyseus.js";
+import { Client } from "colyseus.js";
+import { State } from "../server/rooms/State";
 
 const ENDPOINT = (process.env.NODE_ENV==="development")
     ? "ws://localhost:8080"
@@ -15,12 +16,14 @@ export class Application extends PIXI.Application {
     currentPlayerEntity: PIXI.Graphics;
 
     client = new Client(ENDPOINT);
-    room = this.client.join("arena");
+    room = this.client.join<State>("arena", {});
 
     viewport: Viewport;
 
-    _axisListener: any;
     _interpolation: boolean;
+
+    isSchemaSerializer: boolean = true;
+    _axisListener: any;
 
     constructor () {
         super({
@@ -45,7 +48,23 @@ export class Application extends PIXI.Application {
         // add viewport to stage
         this.stage.addChild(this.viewport);
 
-        this.initialize();
+        this.room.onJoin.add(() => {
+            this.isSchemaSerializer = this.room.serializerId === "schema";
+
+            if (this.isSchemaSerializer) {
+                /**
+                 * Using `@colyseus/schema` as serialization method
+                 */
+                this.initializeSchema();
+
+            } else {
+                /**
+                 * Using `fossil-delta` as serialization method
+                 */
+                this.initializeFossilDelta();
+            }
+        });
+
         this.interpolation = false;
 
         this.viewport.on("mousemove", (e) => {
@@ -56,11 +75,62 @@ export class Application extends PIXI.Application {
         });
     }
 
-    initialize() {
+    initializeSchema() {
+        this.room.state.entities.onAdd = (entity, sessionId: string) => {
+            const color = (entity.radius < 10)
+                ? 0xff0000
+                : 0xFFFF0B;
+
+            const graphics = new PIXI.Graphics();
+            graphics.lineStyle(0);
+            graphics.beginFill(color, 0.5);
+            graphics.drawCircle(0, 0, entity.radius);
+            graphics.endFill();
+
+            graphics.x = entity.x;
+            graphics.y = entity.y;
+            this.viewport.addChild(graphics);
+
+            this.entities[sessionId] = graphics;
+
+            // detecting current user
+            if (sessionId === this.room.sessionId) {
+                this.currentPlayerEntity = graphics;
+                this.viewport.follow(this.currentPlayerEntity);
+            }
+
+            entity.onChange = (changes) => {
+                console.log("entity change: ", entity.x, entity.y);
+                const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
+
+                const graphics = this.entities[sessionId];
+
+                // set x/y directly if interpolation is turned off
+                if (!this._interpolation) {
+                    graphics.x = entity.x;
+                    graphics.y = entity.y;
+                }
+
+                graphics.clear();
+                graphics.lineStyle(0);
+                graphics.beginFill(color, 0.5);
+                graphics.drawCircle(0, 0, entity.radius);
+                graphics.endFill();
+            }
+        }
+
+        this.room.state.entities.onRemove = (_, sessionId: string) => {
+            this.viewport.removeChild(this.entities[sessionId]);
+            this.entities[sessionId].destroy();
+            delete this.entities[sessionId];
+        }
+    }
+
+    initializeFossilDelta() {
         // add / removal of entities
-        this.room.listen("entities/:id", (change: DataChange) => {
+        this.room.listen("entities/:id", (change) => {
             if (change.operation === "add") {
-                const color = (change.value.radius < 4)
+                const color = (change.value.radius < 10)
                     ? 0xff0000
                     : 0xFFFF0B;
 
@@ -89,8 +159,8 @@ export class Application extends PIXI.Application {
             }
         });
 
-        this.room.listen("entities/:id/radius", (change: DataChange) => {
-            const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
+        this.room.listen("entities/:id/radius", (change) => {
+            const color = (change.value < 10) ? 0xff0000 : 0xFFFF0B;
 
             const graphics = this.entities[change.path.id];
             graphics.clear();
@@ -98,14 +168,6 @@ export class Application extends PIXI.Application {
             graphics.beginFill(color, 0.5);
             graphics.drawCircle(0, 0, change.value);
             graphics.endFill();
-
-            // if (this.currentPlayerEntity) {
-            //     // console.log(this.currentPlayerEntity.width);
-            //     // console.log(this.currentPlayerEntity.width / 20);
-            //     this.viewport.scale.x = lerp(this.viewport.scale.x, this.currentPlayerEntity.width / 20, 0.2)
-            //     this.viewport.scale.y = lerp(this.viewport.scale.y, this.currentPlayerEntity.width / 20, 0.2)
-            // }
-
         });
     }
 
@@ -113,12 +175,15 @@ export class Application extends PIXI.Application {
         this._interpolation = bool;
 
         if (this._interpolation) {
-            this.room.removeListener(this._axisListener);
             this.loop();
 
-        } else {
+            if (!this.isSchemaSerializer) {
+                this.room.removeListener(this._axisListener);
+            }
+
+        } else if (!this.isSchemaSerializer) {
             // update entities position directly when they arrive
-            this._axisListener = this.room.listen("entities/:id/:axis", (change: DataChange) => {
+            this._axisListener = this.room.listen("entities/:id/:axis", (change) => {
                 this.entities[change.path.id][change.path.axis] = change.value;
             }, true);
         }

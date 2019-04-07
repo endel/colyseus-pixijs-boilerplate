@@ -2,11 +2,12 @@
     "compilerOptions": {
         "outDir": "lib",
         "module": "commonjs",
-        "lib": ["es6"],
+        "lib": ["es5"],
         "target": "es2015",
         "declaration": true,
         "experimentalDecorators": true,
         "noImplicitAny": false,
+        "esModuleInterop": true,
         "sourceMap": false
     },
     "include": [

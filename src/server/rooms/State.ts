@@ -1,25 +1,29 @@
-import * as nanoid from "nanoid";
+import nanoid from "nanoid";
 import { Entity } from "./Entity";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 
 const WORLD_SIZE = 2000;
 const DEFAULT_PLAYER_RADIUS = 10;
 
-export class State {
+export class State extends Schema {
+
   width = WORLD_SIZE;
   height = WORLD_SIZE;
 
-  entities: { [id: string]: Entity } = {};
+  @type({ map: Entity })
+  entities = new MapSchema<Entity>();
 
-  constructor () {
+  initialize () {
     // create some food entities
-    for (let i=0; i<100; i++) {
+    for (let i = 0; i < 100; i++) {
       this.createFood();
     }
   }
 
   createFood () {
-    const food = new Entity(Math.random() * this.width, Math.random() * this.height, 2);
-    this.entities[nanoid()] = food;
+    const radius = Math.max(4, (Math.random() * (DEFAULT_PLAYER_RADIUS - 1)));
+    const food = new Entity(Math.random() * this.width, Math.random() * this.height, radius);
+    this.entities[nanoid(8)] = food;
   }
 
   createPlayer (sessionId: string) {
@@ -37,6 +41,7 @@ export class State {
 
       if (entity.dead) {
         deadEntities.push(sessionId);
+        continue;
       }
 
       if (entity.radius >= DEFAULT_PLAYER_RADIUS) {
@@ -44,16 +49,28 @@ export class State {
           const collideTestEntity = this.entities[collideSessionId]
 
           // prevent collision with itself
-          if (collideTestEntity === entity) { continue; }
+          if (collideTestEntity === entity) {
+            continue;
+          }
 
-          if (Entity.distance(entity, collideTestEntity) < entity.radius) {
-            entity.radius += collideTestEntity.radius / 5;
-            collideTestEntity.dead = true;
-            deadEntities.push(collideSessionId);
+          if (
+            entity.radius > collideTestEntity.radius &&
+            Entity.distance(entity, collideTestEntity) <= entity.radius - (collideTestEntity.radius / 2)
+          ) {
+            let winnerEntity: Entity = entity;
+            let loserEntity: Entity = collideTestEntity;
+            let loserEntityId: string = collideSessionId;
+
+            winnerEntity.radius += loserEntity.radius / 5;
+            loserEntity.dead = true;
+            deadEntities.push(loserEntityId);
 
             // create a replacement food
             if (collideTestEntity.radius < DEFAULT_PLAYER_RADIUS) {
               this.createFood();
+
+            } else {
+              console.log(loserEntityId, "has been eaten!");
             }
           }
         }
