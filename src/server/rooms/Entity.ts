@@ -1,9 +1,9 @@
 import { Schema, type } from "@colyseus/schema";
 
 export class Entity extends Schema {
-    @type("number") x: number;
-    @type("number") y: number;
-    @type("number") radius: number;
+    @type("float64") x: number;
+    @type("float64") y: number;
+    @type("float32") radius: number;
 
     dead: boolean = false;
     angle: number = 0;

@@ -27,7 +27,7 @@ export class ArenaRoom extends Room<State> {
     const [command, data] = message;
 
   // change angle
-    if (command === "mouse") { 
+    if (command === "mouse") {
       const dst = Entity.distance(entity, data as Entity);
       entity.speed = (dst < 20) ? 0 : Math.min(dst / 15, 4);
       entity.angle = Math.atan2(entity.y - data.y, entity.x - data.x);

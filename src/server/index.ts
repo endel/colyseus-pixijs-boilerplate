@@ -14,6 +14,7 @@ import http from "http";
 import express from "express";
 import path from "path";
 import basicAuth from "express-basic-auth";
+import socialRoutes from "@colyseus/social/express";
 import { monitor } from "@colyseus/monitor";
 
 import { ArenaRoom } from "./rooms/ArenaRoom";
@@ -42,6 +43,9 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.use("/", express.static(STATIC_DIR));
+
+// @colyseus/social routes
+app.use("/", socialRoutes);
 
 // add colyseus monitor
 const auth = basicAuth({ users: { 'admin': 'admin' }, challenge: true });

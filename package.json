@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "schema-codegen": "schema-codegen src/server/rooms/*.ts --ts --output src/client/schema/",
     "heroku-postbuild": "tsc && webpack",
     "start": "node ./lib/index.js",
     "dev": "nodemon",
@@ -33,9 +34,11 @@
   },
   "dependencies": {
     "@colyseus/monitor": "^0.10.0",
+    "@colyseus/social": "^0.10.0",
     "colyseus": "^0.10.3",
-    "colyseus.js": "^0.10.4",
+    "colyseus.js": "^0.10.8",
     "express": "^4.16.4",
-    "express-basic-auth": "^1.1.6"
+    "express-basic-auth": "^1.1.6",
+    "express-jwt": "^5.3.1"
   }
 }
