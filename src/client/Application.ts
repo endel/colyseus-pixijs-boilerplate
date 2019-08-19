@@ -62,56 +62,55 @@ export class Application extends PIXI.Application {
 
         console.log("Success!", this.client.auth);
 
-        this.room = this.client.join<State>("arena");
-        this.room.onJoin.add(() => {
-            this.room.state.entities.onAdd = (entity, sessionId: string) => {
-                const color = (entity.radius < 10)
-                    ? 0xff0000
-                    : 0xFFFF0B;
+        this.room = await this.client.joinOrCreate<State>("arena");
 
-                const graphics = new PIXI.Graphics();
+        this.room.state.entities.onAdd = (entity, sessionId: string) => {
+            const color = (entity.radius < 10)
+                ? 0xff0000
+                : 0xFFFF0B;
+
+            const graphics = new PIXI.Graphics();
+            graphics.lineStyle(0);
+            graphics.beginFill(color, 0.5);
+            graphics.drawCircle(0, 0, entity.radius);
+            graphics.endFill();
+
+            graphics.x = entity.x;
+            graphics.y = entity.y;
+            this.viewport.addChild(graphics);
+
+            this.entities[sessionId] = graphics;
+
+            // detecting current user
+            if (sessionId === this.room.sessionId) {
+                this.currentPlayerEntity = graphics;
+                this.viewport.follow(this.currentPlayerEntity);
+            }
+
+            entity.onChange = (changes) => {
+                const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
+
+                const graphics = this.entities[sessionId];
+
+                // set x/y directly if interpolation is turned off
+                if (!this._interpolation) {
+                    graphics.x = entity.x;
+                    graphics.y = entity.y;
+                }
+
+                graphics.clear();
                 graphics.lineStyle(0);
                 graphics.beginFill(color, 0.5);
                 graphics.drawCircle(0, 0, entity.radius);
                 graphics.endFill();
-
-                graphics.x = entity.x;
-                graphics.y = entity.y;
-                this.viewport.addChild(graphics);
-
-                this.entities[sessionId] = graphics;
-
-                // detecting current user
-                if (sessionId === this.room.sessionId) {
-                    this.currentPlayerEntity = graphics;
-                    this.viewport.follow(this.currentPlayerEntity);
-                }
-
-                entity.onChange = (changes) => {
-                    const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
-
-                    const graphics = this.entities[sessionId];
-
-                    // set x/y directly if interpolation is turned off
-                    if (!this._interpolation) {
-                        graphics.x = entity.x;
-                        graphics.y = entity.y;
-                    }
-
-                    graphics.clear();
-                    graphics.lineStyle(0);
-                    graphics.beginFill(color, 0.5);
-                    graphics.drawCircle(0, 0, entity.radius);
-                    graphics.endFill();
-                }
             }
+        };
 
-            this.room.state.entities.onRemove = (_, sessionId: string) => {
-                this.viewport.removeChild(this.entities[sessionId]);
-                this.entities[sessionId].destroy();
-                delete this.entities[sessionId];
-            }
-        });
+        this.room.state.entities.onRemove = (_, sessionId: string) => {
+            this.viewport.removeChild(this.entities[sessionId]);
+            this.entities[sessionId].destroy();
+            delete this.entities[sessionId];
+        };
     }
 
     set interpolation (bool: boolean) {

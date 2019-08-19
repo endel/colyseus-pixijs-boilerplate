@@ -25,9 +25,12 @@ export const endpoint = "localhost";
 export let STATIC_DIR: string;
 
 const app = express();
-const gameServer = new Server({ server: http.createServer(app) });
+const gameServer = new Server({
+  server: http.createServer(app),
+  express: app
+});
 
-gameServer.register("arena", ArenaRoom);
+gameServer.define("arena", ArenaRoom);
 
 if (process.env.NODE_ENV !== "production") {
     const webpackCompiler = webpack(webpackConfig({}));

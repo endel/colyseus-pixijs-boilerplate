@@ -4,7 +4,7 @@ import { State } from "./State";
 
 export class ArenaRoom extends Room<State> {
 
-  onInit() {
+  onCreate() {
     this.setState(new State());
     this.state.initialize();
     this.setSimulationInterval(() => this.state.update());
