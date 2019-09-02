@@ -6,6 +6,8 @@ A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version
 
 ## Running locally
 
+This demo uses `@colyseus/social`, that requires [MongoDB](https://www.mongodb.com/download-center#community) to be installed on your machine. Alternatively, you can remove [this line](https://github.com/endel/colyseus-pixijs-boilerplate/blob/76c4879597faafb4f2450a03d8017c75c251ab32/src/client/Application.ts#L61) if you don't want to use it.
+
 ```
 git clone https://github.com/endel/colyseus-pixijs-boilerplate.git
 cd colyseus-pixijs-boilerplate
