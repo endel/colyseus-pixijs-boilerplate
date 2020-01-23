@@ -52,7 +52,7 @@ app.use("/", socialRoutes);
 
 // add colyseus monitor
 const auth = basicAuth({ users: { 'admin': 'admin' }, challenge: true });
-app.use("/colyseus", auth, monitor(gameServer));
+app.use("/colyseus", auth, monitor());
 
 gameServer.listen(port);
 console.log(`Listening on http://${endpoint}:${port}`);
