@@ -51,7 +51,7 @@ export class Application extends PIXI.Application {
         this.viewport.on("mousemove", (e) => {
             if (this.currentPlayerEntity) {
                 const point = this.viewport.toLocal(e.data.global);
-                this.room.send(['mouse', { x: point.x, y: point.y }]);
+                this.room.send('mouse', { x: point.x, y: point.y });
             }
         });
     }
