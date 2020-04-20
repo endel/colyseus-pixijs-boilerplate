@@ -13,7 +13,6 @@ export class ArenaRoom extends Room<State> {
     this.setState(new State());
     this.state.initialize();
 
-    this.setSimulationInterval(() => this.state.update());
     this.onMessage("mouse", (client, message: MouseMessage) => {
       const entity = this.state.entities[client.sessionId];
 
@@ -28,6 +27,8 @@ export class ArenaRoom extends Room<State> {
       entity.speed = (dst < 20) ? 0 : Math.min(dst / 15, 4);
       entity.angle = Math.atan2(entity.y - message.y, entity.x - message.x);
     });
+
+    this.setSimulationInterval(() => this.state.update());
   }
 
   onJoin(client: Client, options: any) {
