@@ -34,9 +34,6 @@ export class ArenaRoom extends Room<State> {
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, "JOINED");
     this.state.createPlayer(client.sessionId);
-
-    // touch all entities to make sure client is synchronized with filters.
-    this.state.entities.forEach((entity) => entity['$changes'].touch(0));
   }
 
   onLeave(client: Client) {

@@ -107,7 +107,6 @@ export class Application extends PIXI.Application {
         };
 
         this.room.state.entities.onRemove = (_, sessionId: string) => {
-            console.log("ON REMOVE!", sessionId);
             this.viewport.removeChild(this.entities[sessionId]);
             this.entities[sessionId].destroy();
             delete this.entities[sessionId];
