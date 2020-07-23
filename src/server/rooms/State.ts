@@ -1,5 +1,5 @@
-import nanoid from "nanoid";
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { generateId } from "colyseus";
+import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 
 import { Entity } from "./Entity";
 import { Player } from "./Player";
@@ -12,6 +12,18 @@ export class State extends Schema {
   width = WORLD_SIZE;
   height = WORLD_SIZE;
 
+  @filterChildren(function(client, key: string, value: Entity, root: State) {
+    const currentPlayer = root.entities.get(client.sessionId);
+    if (currentPlayer) {
+        const a = value.x - currentPlayer.x;
+        const b = value.y - currentPlayer.y;
+
+        return (Math.sqrt(a * a + b * b)) <= 500;
+
+    } else {
+        return false;
+    }
+  })
   @type({ map: Entity })
   entities = new MapSchema<Entity>();
 
@@ -23,36 +35,33 @@ export class State extends Schema {
   }
 
   createFood () {
-    const radius = Math.max(4, (Math.random() * (DEFAULT_PLAYER_RADIUS - 1)));
-    const food = new Entity(Math.random() * this.width, Math.random() * this.height, radius);
-    this.entities[nanoid(8)] = food;
+    const food = new Entity().assign({
+      x: Math.random() * this.width,
+      y: Math.random() * this.height,
+      radius: Math.max(4, (Math.random() * (DEFAULT_PLAYER_RADIUS - 1)))
+    });
+    this.entities.set(generateId(), food);
   }
 
-  createPlayer (sessionId: string) {
-    this.entities[sessionId] = new Player(
-      Math.random() * this.width,
-      Math.random() * this.height
-    );
+  createPlayer(sessionId: string) {
+    this.entities.set(sessionId, new Player().assign({
+      x: Math.random() * this.width,
+      y: Math.random() * this.height
+    }));
   }
 
   update() {
     const deadEntities: string[] = [];
-    for (const sessionId in this.entities) {
-      const entity = this.entities[sessionId];
-
+    this.entities.forEach((entity, sessionId) => {
       if (entity.dead) {
         deadEntities.push(sessionId);
-        continue;
+        return;
       }
 
       if (entity.radius >= DEFAULT_PLAYER_RADIUS) {
-        for (const collideSessionId in this.entities) {
-          const collideTestEntity = this.entities[collideSessionId]
-
+        this.entities.forEach((collideTestEntity, collideSessionId) => {
           // prevent collision with itself
-          if (collideTestEntity === entity) {
-            continue;
-          }
+          if (collideTestEntity === entity) { return; }
 
           if (
             entity.radius > collideTestEntity.radius &&
@@ -74,7 +83,7 @@ export class State extends Schema {
               console.log(loserEntityId, "has been eaten!");
             }
           }
-        }
+        });
       }
 
       if (entity.speed > 0) {
@@ -86,10 +95,18 @@ export class State extends Schema {
         if (entity.x > WORLD_SIZE) { entity.x = WORLD_SIZE; }
         if (entity.y < 0) { entity.y = 0; }
         if (entity.y > WORLD_SIZE) { entity.y = WORLD_SIZE; }
+
+      } else {
+        //
+        // touch all satic entities for filtering by distance...
+        //
+        entity['$changes'].touch(0);
       }
-    }
+    });
 
     // delete all dead entities
-    deadEntities.forEach(entityId => delete this.entities[entityId]);
+    deadEntities.forEach(entityId => {
+      this.entities.delete(entityId);
+    });
   }
 }
