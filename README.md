@@ -1,4 +1,4 @@
-# Colyseus + PixiJS <a href="https://patreon.com/endel" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fendel&style=for-the-badge" alt="Donate on Patreon"/></a>
+# Colyseus + PixiJS
 
 A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version of the classical [agar.io](http://agar.io/) game.
 
