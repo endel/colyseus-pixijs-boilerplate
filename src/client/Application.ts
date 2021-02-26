@@ -44,7 +44,7 @@ export class Application extends PIXI.Application {
         // add viewport to stage
         this.stage.addChild(this.viewport);
 
-        this.authenticate();
+        this.connect();
 
         this.interpolation = false;
 
@@ -56,12 +56,7 @@ export class Application extends PIXI.Application {
         });
     }
 
-    async authenticate() {
-        // anonymous auth
-        await this.client.auth.login();
-
-        console.log("Success!", this.client.auth);
-
+    async connect() {
         this.room = await this.client.joinOrCreate<State>("arena");
 
         this.room.state.entities.onAdd = (entity, sessionId: string) => {
