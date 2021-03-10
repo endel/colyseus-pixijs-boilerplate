@@ -21,8 +21,5 @@ document.addEventListener("click", (e) => {
     if (el.id === "interpolation") {
         app.interpolation = (el as HTMLInputElement).checked;
 
-    } else if (el.id === "push") {
-        app.client.push.register();
-
     }
 });
