@@ -7,7 +7,7 @@ interface MouseMessage {
   y: number;
 }
 
-export class ArenaRoom extends Room<State> {
+export class MyRoom extends Room<State> {
 
   onCreate() {
     this.setState(new State());

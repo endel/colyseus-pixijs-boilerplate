@@ -1,21 +1,20 @@
 # Colyseus + PixiJS
 
-A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version of the classical [agar.io](http://agar.io/) game.
+A simple boilerplate using Colyseus + PixiJS. It implements a simplistic version of the classic [agar.io](http://agar.io/) game.
 
-[View live demo](https://colyseus-pixijs-boilerplate.herokuapp.com)
-
-## Running locally
-
-This demo uses `@colyseus/social`, that requires [MongoDB](https://www.mongodb.com/download-center#community) to be installed on your machine. Alternatively, you can remove [this line](https://github.com/endel/colyseus-pixijs-boilerplate/blob/76c4879597faafb4f2450a03d8017c75c251ab32/src/client/Application.ts#L61) if you don't want to use it.
+## Running server and client locally
 
 ```
 git clone https://github.com/endel/colyseus-pixijs-boilerplate.git
 cd colyseus-pixijs-boilerplate
 npm install
-npm run dev
+npm start
 ```
 
-Open [http://localhost:8080](http://localhost:8080) in your browser.
+Open [http://localhost:1234](http://localhost:1234) in your browser.
+
+> The `npm start` runs both `npm run start-client` and `npm run start-server`.
+> You need both client and server to test this application.
 
 ## Directory structure
 
@@ -30,10 +29,9 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 │   └── server
 │       ├── index.ts
 │       └── rooms
-│           ├── ArenaRoom.ts
+│           ├── MyRoom.ts
 │           ├── Entity.ts
 │           └── State.ts
-├── tsconfig-client.json
 ├── tsconfig.json
 └── webpack.config.js
 ```
