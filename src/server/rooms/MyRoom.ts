@@ -8,13 +8,13 @@ interface MouseMessage {
 }
 
 export class MyRoom extends Room<State> {
+  state = new State();
 
   onCreate() {
-    this.setState(new State());
     this.state.initialize();
 
     this.onMessage("mouse", (client, message: MouseMessage) => {
-      const entity = this.state.entities[client.sessionId];
+      const entity = this.state.entities.get(client.sessionId);
 
       // skip dead players
       if (!entity) {
@@ -38,7 +38,7 @@ export class MyRoom extends Room<State> {
 
   onLeave(client: Client) {
     console.log(client.sessionId, "LEFT!");
-    const entity = this.state.entities[client.sessionId];
+    const entity = this.state.entities.get(client.sessionId);
 
     // entity may be already dead.
     if (entity) { entity.dead = true; }

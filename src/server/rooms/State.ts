@@ -1,5 +1,5 @@
 import { generateId } from "colyseus";
-import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 
 import { Entity } from "./Entity";
 import { Player } from "./Player";
@@ -12,18 +12,6 @@ export class State extends Schema {
   width = WORLD_SIZE;
   height = WORLD_SIZE;
 
-  @filterChildren(function(client, key: string, value: Entity, root: State) {
-    const currentPlayer = root.entities.get(client.sessionId);
-    if (currentPlayer) {
-        const a = value.x - currentPlayer.x;
-        const b = value.y - currentPlayer.y;
-
-        return (Math.sqrt(a * a + b * b)) <= 500;
-
-    } else {
-        return false;
-    }
-  })
   @type({ map: Entity })
   entities = new MapSchema<Entity>();
 
@@ -100,7 +88,7 @@ export class State extends Schema {
         //
         // touch all satic entities for filtering by distance...
         //
-        entity['$changes'].touch(0);
+        //entity['$changes'].touch(0);
       }
     });
 

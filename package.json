@@ -1,13 +1,14 @@
 {
   "name": "colyseus-pixijs-boilerplate",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "npm run start-client & npm run start-server",
-    "start-client": "parcel serve src/client/index.html",
+    "start-client": "vite",
     "start-server": "tsx watch src/server/index.ts",
-    "build": "parcel build src/client/index.html && tsc",
+    "build": "vite build",
+    "preview": "vite preview",
     "schema-codegen": "schema-codegen src/server/rooms/*.ts --ts --output src/client/schema/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,32 +18,24 @@
     "node": ">=14.16.0"
   },
   "devDependencies": {
-    "@colyseus/loadtest": "^0.15.0",
-    "@types/express": "^4.16.1",
-    "@types/redis": "^2.8.12",
+    "@colyseus/loadtest": "^0.16.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/redis": "^4.0.10",
     "debug": "^4.1.1",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "file-loader": "^3.0.1",
-    "html-webpack-plugin": "^3.2.0",
-    "parcel": "^2.9.3",
-    "pixi-viewport": "^3.17.0",
-    "pixi.js": "^5.0.0-rc",
-    "punycode": "^1.4.1",
-    "ts-loader": "^5.3.3",
-    "tsx": "^3.12.7",
-    "typescript": "^4.2.2",
-    "webpack": "^4.29.0",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-middleware": "^3.5.1",
-    "webpack-dev-server": "^3.1.14",
-    "webpack-hot-middleware": "^2.24.3"
+    "pixi-viewport": "^6.0.3",
+    "pixi.js": "^8.14.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.7"
   },
   "dependencies": {
-    "@colyseus/monitor": "^0.15.0",
-    "colyseus": "^0.15.0",
-    "colyseus.js": "^0.15.0",
-    "express": "^4.16.4",
-    "express-basic-auth": "^1.2.0",
-    "express-jwt": "^5.3.1"
+    "@colyseus/core": "^0.16.24",
+    "@colyseus/monitor": "^0.16.7",
+    "colyseus": "^0.16.5",
+    "colyseus.js": "^0.16.22",
+    "express": "^5.2.1",
+    "express-basic-auth": "^1.2.1",
+    "express-jwt": "^8.5.1"
   }
 }

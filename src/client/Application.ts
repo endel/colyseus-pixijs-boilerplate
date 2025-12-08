@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
-import * as Viewport from "pixi-viewport";
-import { Room, Client } from "colyseus.js";
+import { Viewport } from "pixi-viewport";
+import { Room, Client, getStateCallbacks } from "colyseus.js";
 import { State } from "../server/rooms/State";
 
 const ENDPOINT = "http://localhost:2567";
@@ -10,19 +10,24 @@ export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
 
 export class Application extends PIXI.Application {
     entities: { [id: string]: PIXI.Graphics } = {};
-    currentPlayerEntity: PIXI.Graphics;
+    currentPlayerEntity?: PIXI.Graphics;
 
     client = new Client(ENDPOINT);
-    room: Room<State>;
+    room?: Room<State>;
 
-    viewport: Viewport;
-    _interpolation: boolean;
+    viewport?: Viewport;
+    _interpolation?: boolean;
 
-    constructor () {
-        super({
+    constructor(){
+        super();
+    }
+
+    async init(options?: Partial<PIXI.ApplicationOptions> | undefined): Promise<void> {
+        await super.init({        
             width: window.innerWidth,
             height: window.innerHeight,
-            backgroundColor: 0x0c0c0c
+            backgroundColor: 0x0c0c0c,
+            ...options,
         });
 
         this.viewport = new Viewport({
@@ -30,12 +35,12 @@ export class Application extends PIXI.Application {
             screenHeight: window.innerHeight,
             worldWidth: WORLD_SIZE,
             worldHeight: WORLD_SIZE,
+            events: this.renderer.events
         });
 
         // draw boundaries of the world
-        const boundaries = new PIXI.Graphics();
-        boundaries.beginFill(0x000000);
-        boundaries.drawRoundedRect(0, 0, WORLD_SIZE, WORLD_SIZE, 30);
+        const boundaries = new PIXI.Graphics();        
+        boundaries.roundRect(0, 0, WORLD_SIZE, WORLD_SIZE, 30).fill(0x000000);
         this.viewport.addChild(boundaries);
 
         // add viewport to stage
@@ -45,9 +50,10 @@ export class Application extends PIXI.Application {
 
         this.interpolation = false;
 
+        // Handle mouse movement for player control
         this.viewport.on("mousemove", (e) => {
-            if (this.currentPlayerEntity) {
-                const point = this.viewport.toLocal(e.data.global);
+            if (this.currentPlayerEntity && this.viewport && this.room) {
+                const point = this.viewport.toWorld(e.global);
                 this.room.send('mouse', { x: point.x, y: point.y });
             }
         });
@@ -56,30 +62,32 @@ export class Application extends PIXI.Application {
     async connect() {
         this.room = await this.client.joinOrCreate<State>("my_room");
 
-        this.room.state.entities.onAdd((entity, sessionId: string) => {
+        const $ = getStateCallbacks(this.room);
+
+        $(this.room.state).entities.onAdd((entity, sessionId: string) => {
             const color = (entity.radius < 10)
                 ? 0xff0000
                 : 0xFFFF0B;
 
             const graphics = new PIXI.Graphics();
-            graphics.lineStyle(0);
-            graphics.beginFill(color, 0.5);
-            graphics.drawCircle(0, 0, entity.radius);
-            graphics.endFill();
+            graphics.setStrokeStyle(0).setFillStyle({ color, alpha: 0.5 });
+            graphics.circle(0, 0, entity.radius);
+            graphics.fill();            
 
             graphics.x = entity.x;
             graphics.y = entity.y;
-            this.viewport.addChild(graphics);
+            
+            this.viewport!.addChild(graphics);
 
             this.entities[sessionId] = graphics;
 
             // detecting current user
-            if (sessionId === this.room.sessionId) {
+            if (sessionId === this.room?.sessionId) {
                 this.currentPlayerEntity = graphics;
-                this.viewport.follow(this.currentPlayerEntity);
+                this.viewport!.follow(this.currentPlayerEntity);
             }
 
-            entity.onChange(() => {
+            $(entity).onChange(() => {
                 const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
 
                 const graphics = this.entities[sessionId];
@@ -91,15 +99,15 @@ export class Application extends PIXI.Application {
                 }
 
                 graphics.clear();
-                graphics.lineStyle(0);
-                graphics.beginFill(color, 0.5);
-                graphics.drawCircle(0, 0, entity.radius);
-                graphics.endFill();
+                graphics.setStrokeStyle(0);
+                graphics.setFillStyle({ color, alpha: 0.5 });
+                graphics.circle(0, 0, entity.radius);
+                graphics.fill();
             });
         });
 
-        this.room.state.entities.onRemove((_, sessionId: string) => {
-            this.viewport.removeChild(this.entities[sessionId]);
+        $(this.room.state).entities.onRemove((_, sessionId: string) => {
+            this.viewport!.removeChild(this.entities[sessionId]);
             this.entities[sessionId].destroy();
             delete this.entities[sessionId];
         });
@@ -115,8 +123,11 @@ export class Application extends PIXI.Application {
 
     loop () {
         for (let id in this.entities) {
-            this.entities[id].x = lerp(this.entities[id].x, this.room.state.entities[id].x, 0.2);
-            this.entities[id].y = lerp(this.entities[id].y, this.room.state.entities[id].y, 0.2);
+            const entity = this.room?.state.entities.get(id);
+            if(entity){
+                this.entities[id].x = lerp(this.entities[id].x, entity.x, 0.2);
+                this.entities[id].y = lerp(this.entities[id].y, entity.y, 0.2);
+            }
         }
 
         // continue looping if interpolation is still enabled.

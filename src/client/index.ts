@@ -1,17 +1,19 @@
 import { Application } from "./Application";
 
 const app = new Application();
-app.interpolation = true;
-document.body.appendChild(app.view);
 
-app.interpolation = true;
+// Initialize the application
+app.init().then(() => {
+    app.interpolation = true;
+    document.body.appendChild(app.canvas);
+});
 
 (window as any).app = app;
 
 // allow to resize viewport and renderer
 window.onresize = () => {
-    app.viewport.resize(window.innerWidth, window.innerHeight);
     app.renderer.resize(window.innerWidth, window.innerHeight);
+    app.viewport!.resize(window.innerWidth, window.innerHeight);
 }
 
 // toggle interpolation

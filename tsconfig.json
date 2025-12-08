@@ -1,17 +1,29 @@
 {
     "compilerOptions": {
         "outDir": "lib",
-        "module": "commonjs",
-        "lib": ["es5"],
-        "target": "es2015",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "target": "ES2020",
         "declaration": true,
         "experimentalDecorators": true,
         "noImplicitAny": false,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "strict": true,
-        "sourceMap": false
+        "sourceMap": false,
+        "skipLibCheck": true,
+        "isolatedModules": true,
+        "resolveJsonModule": true
     },
     "include": [
-      "src/server/**/*.ts"
+      "src/server/**/*.ts",
+      "src/client/**/*.ts",
+      "vite.config.ts"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist",
+      "lib"
     ]
 }
