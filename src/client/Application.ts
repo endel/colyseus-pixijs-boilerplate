@@ -18,10 +18,6 @@ export class Application extends PIXI.Application {
     viewport?: Viewport;
     _interpolation?: boolean;
 
-    constructor(){
-        super();
-    }
-
     async init(options?: Partial<PIXI.ApplicationOptions> | undefined): Promise<void> {
         await super.init({        
             width: window.innerWidth,

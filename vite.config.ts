@@ -4,7 +4,7 @@ import path from 'path'
 export default defineConfig({
   root: 'src/client',
   build: {
-    outDir: '../../dist',
+    outDir: '../../build',
     emptyOutDir: true,
     target: 'es2020',
   },
