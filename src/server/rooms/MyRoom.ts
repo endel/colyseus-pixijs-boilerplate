@@ -7,7 +7,7 @@ interface MouseMessage {
   y: number;
 }
 
-export class MyRoom extends Room<State> {
+export class MyRoom extends Room {
   state = new State();
 
   onCreate() {

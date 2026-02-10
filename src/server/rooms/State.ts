@@ -12,8 +12,7 @@ export class State extends Schema {
   width = WORLD_SIZE;
   height = WORLD_SIZE;
 
-  @type({ map: Entity })
-  entities = new MapSchema<Entity>();
+  @type({ map: Entity }) entities = new MapSchema<Entity>();
 
   initialize () {
     // create some food entities

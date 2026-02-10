@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
-import { Room, Client, getStateCallbacks } from "colyseus.js";
-import { State } from "../server/rooms/State";
+import { Room, Client, Callbacks } from "@colyseus/sdk";
+import type { State } from "../server/rooms/State";
 
 const ENDPOINT = "http://localhost:2567";
 const WORLD_SIZE = 2000;
@@ -58,9 +58,9 @@ export class Application extends PIXI.Application {
     async connect() {
         this.room = await this.client.joinOrCreate<State>("my_room");
 
-        const $ = getStateCallbacks(this.room);
+        const callbacks = Callbacks.get(this.room);
 
-        $(this.room.state).entities.onAdd((entity, sessionId: string) => {
+        callbacks.onAdd("entities", (entity, sessionId: string) => {
             const color = (entity.radius < 10)
                 ? 0xff0000
                 : 0xFFFF0B;
@@ -83,7 +83,7 @@ export class Application extends PIXI.Application {
                 this.viewport!.follow(this.currentPlayerEntity);
             }
 
-            $(entity).onChange(() => {
+            callbacks.onChange(entity, () => {
                 const color = (entity.radius < 10) ? 0xff0000 : 0xFFFF0B;
 
                 const graphics = this.entities[sessionId];
@@ -102,7 +102,7 @@ export class Application extends PIXI.Application {
             });
         });
 
-        $(this.room.state).entities.onRemove((_, sessionId: string) => {
+        callbacks.onRemove("entities", (_, sessionId: string) => {
             this.viewport!.removeChild(this.entities[sessionId]);
             this.entities[sessionId].destroy();
             delete this.entities[sessionId];

@@ -30,10 +30,9 @@
     "vite": "^7.2.7"
   },
   "dependencies": {
-    "@colyseus/core": "^0.16.24",
-    "@colyseus/monitor": "^0.16.7",
-    "colyseus": "^0.16.5",
-    "colyseus.js": "^0.16.22",
+    "colyseus": "^0.17.0",
+    "@colyseus/tools": "^0.17.0",
+    "@colyseus/sdk": "^0.17.0",
     "express": "^5.2.1",
     "express-basic-auth": "^1.2.1",
     "express-jwt": "^8.5.1"
